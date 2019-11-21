@@ -47,7 +47,12 @@ func newDefaultFiller() *Filler {
 	funcs[reflect.Int8] = funcs[reflect.Int]
 	funcs[reflect.Int16] = funcs[reflect.Int]
 	funcs[reflect.Int32] = funcs[reflect.Int]
-	funcs[reflect.Int64] = funcs[reflect.Int]
+	funcs[reflect.Int64] = func(field *FieldData) {
+		if value, err := time.ParseDuration(field.TagValue); err != nil {
+			field.Value.SetInt(int64(value))
+		}
+		funcs[reflect.Int](field)
+	}
 
 	funcs[reflect.Float32] = func(field *FieldData) {
 		value, _ := strconv.ParseFloat(field.TagValue, 64)
